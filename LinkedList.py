@@ -65,6 +65,26 @@ class LinkedList:
         else:
             return curr.item
 
+    def __contains__(self, item: Any) -> bool:
+        """Return whether item is in this linked list.
+
+        >>> linky = LinkedList()
+        >>> linky.__contains__(10)
+        False
+        >>> node2 = _Node(20)
+        >>> node1 = _Node(10, node2)
+        >>> linky._first = node1
+        >>> linky.__contains__(20)
+        True
+        """
+        curr = self._first
+
+        while curr is not None:
+            if curr.item == item:
+                return True
+            curr = curr.next
+        return False
+
     def maximum(self) -> float:
         """Return the maximum element in this linked list.
 
@@ -105,3 +125,18 @@ class LinkedList:
             curr = curr.next
 
         return list_so_far
+
+    def sum(self) -> float:
+        """Return the sum of the elements in this linked list.
+
+        Preconditions:
+            - all elements in this linked list are floats
+        """
+        curr = self._first
+        sum_so_far = 0
+
+        while curr is not None:
+            sum_so_far += curr.item
+            curr = curr.next
+
+        return sum_so_far
