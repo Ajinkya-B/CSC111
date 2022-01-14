@@ -59,7 +59,6 @@ class LinkedList:
             curr = curr.next
             curr_index += 1
 
-        assert curr is None or curr_index == item
         if curr is None:
             raise IndexError
         else:
@@ -140,3 +139,47 @@ class LinkedList:
             curr = curr.next
 
         return sum_so_far
+
+    def append(self, item: Any) -> None:
+        """Add the given item to the end of this linked list.
+
+        >>> linky = LinkedList()  # LinkedLists start empty
+        >>> linky.append(111)
+        >>> linky.append(-5)
+        >>> linky.append(9000)
+        >>> linky.to_list()
+        [111, -5, 9000]
+        """
+        new_node = _Node(item)
+        curr = self._first
+
+        if curr is None:
+            self._first = new_node
+        else:
+            while curr.next is not None:
+                curr = curr.next
+
+            curr.next = new_node
+
+    def remove_first(self) -> Any:
+        """Remove and return the first element of this list.
+
+        Raise an IndexError if this list is empty.
+
+        >>> lst = LinkedList([1, 2, 3])
+        >>> lst.remove_first()
+        1
+        >>> lst.to_list()
+        [2, 3]
+        >>> lst.remove_first()
+        2
+        >>> lst.remove_first()
+        3
+        """
+        curr = self._first
+        if curr is None:
+            raise IndexError
+        else:
+            self._first = curr.next
+            return curr.item
+    
