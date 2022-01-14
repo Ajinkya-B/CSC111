@@ -84,6 +84,44 @@ class LinkedList:
             curr = curr.next
         return False
 
+    def __len__(self) -> int:
+        """Return the number of elements in this list. """
+        len_so_far = 1
+        curr = self._first
+
+        if curr is None:
+            return 0
+        else:
+            while curr.next is not None:
+                len_so_far += 1
+                curr = curr.next
+
+            return len_so_far
+
+    def __setitem__(self, i: int, item: Any) -> None:
+        """Store item at index i in this list.
+
+        Raise IndexError if i >= len(self).
+
+        Preconditions:
+            - i >= 0
+        """
+        curr = self._first
+        count = 0
+        if curr is None:
+            raise IndexError
+        elif i == 0:
+            curr.item = item
+        else:
+            while curr.next is not None and count != i:
+                curr = curr.next
+                count += 1
+
+            if curr.next is None:
+                raise IndexError
+            elif count == i:
+                curr.item = item
+
     def maximum(self) -> float:
         """Return the maximum element in this linked list.
 
@@ -139,6 +177,49 @@ class LinkedList:
             curr = curr.next
 
         return sum_so_far
+
+    def count(self, item: Any) -> int:
+        """Return the number of times the given item occurs in this list."""
+        count = 0
+        curr = self._first
+
+        if curr is None:
+            return 0
+        elif curr.next is None:
+            if curr.item == item:
+                return 1
+            else:
+                return 0
+        else:
+            while curr.next is not None:
+                if curr.item == item:
+                    count += 1
+
+            return count
+
+    def index(self, item: Any) -> int:
+        """Return the index of the first occurrence of the given item in this list.
+
+        Raise ValueError if the given item is not present.
+        """
+        curr = self._first
+        count = 0
+
+        if curr is None:
+            raise ValueError
+        elif curr.next is None:
+            if curr.item == item:
+                return 0
+            else:
+                raise ValueError
+        else:
+            while curr.next is not None:
+                if curr.item == item:
+                    return count
+                curr = curr.next
+                count += 1
+
+            raise ValueError
 
     def append(self, item: Any) -> None:
         """Add the given item to the end of this linked list.
