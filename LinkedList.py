@@ -182,4 +182,33 @@ class LinkedList:
         else:
             self._first = curr.next
             return curr.item
-    
+
+    def remove_last(self) -> Any:
+        """Remove and return the last element of this list.
+
+        Raise an IndexError if this list is empty.
+
+        >>> lst = LinkedList([1, 2, 3])
+        >>> lst.remove_last()
+        3
+        >>> lst.to_list()
+        [1, 2]
+        >>> lst.remove_last()
+        2
+        >>> lst.remove_last()
+        1
+        """
+        curr = self._first
+
+        if curr is None:  # Case where linked list is empty
+            raise IndexError
+        elif curr.next is None:  # Case where the liked list only contains one element
+            temp = curr.item
+            self._first = None
+            return temp
+        else:  # Case where the linked list has more than 1 element
+            while curr.next.next is not None:
+                curr = curr.next
+            temp = curr.next.item
+            curr.next = None
+            return temp
