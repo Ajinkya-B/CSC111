@@ -41,8 +41,11 @@ class LinkedList:
     #  - _first: stores the first node of the list, or by default None to represent an empty list
     _first: Optional[_Node]
 
-    def __init__(self) -> None:
+    def __init__(self, items: list) -> None:
+        """Initialize a new linked list containing the given items."""
         self._first = None
+        for item in items:
+            self.append(item)
 
     def __len__(self) -> int:
         """Return the number of elements in this list. """
@@ -294,3 +297,127 @@ class LinkedList:
             temp = curr.next.item
             curr.next = None
             return temp
+
+    def insert(self, i: int, item: Any) -> None:
+        """Insert the given item at index i in this linked list.
+
+        Raise IndexError if i is greater than the length of self.
+
+        If i *equals* the length of self, add the item to the end
+        of the linked list, which is the same as LinkedList.append.
+
+        Preconditions:
+            - i >= 0
+
+        >>> lst = LinkedList([])
+        >>> lst.insert(0, 300)
+        >>> lst.to_list()
+        [300]
+        >>> lst.insert(0, 450)
+        >>> lst.to_list()
+        [450, 300]
+        >>> lst.insert(2, 10)
+        >>> lst.to_list()
+        [450, 300, 10]
+        """
+        curr = self._first
+        if i == 0:
+            self._first = _Node(item, curr)
+        else:
+            count = 0
+            new_node = _Node(item)
+            while curr is not None and count != i - 1:
+                curr = curr.next
+                count += 1
+
+            if curr is None:
+                raise IndexError
+            else:
+                new_node.next = curr.next
+                curr.next = new_node
+
+                # curr.next, new_node.next = new_node, curr.next
+
+    def pop(self, i: int) -> Any:
+        """Remove and return item at index i.
+
+        Preconditions:
+            - i >= 0
+
+        Raise IndexError if i >= the length of self.
+
+        >>> lst = LinkedList([1, 2, 10, 200])
+        >>> lst.pop(2)
+        10
+        >>> lst.pop(0)
+        1
+        >>> lst.to_list()
+        [2, 200]
+        >>> lst.pop(2)
+        Traceback (most recent call last):
+        IndexError
+        """
+        # 1. If the list is empty, you know for sure that index is out of bounds...
+
+        # 2. Else if i is 0, remove the first node and return its item.
+
+        # 3. Else iterate to the (i-1)-th node and update links to remove
+        # the node at position index. But don't forget to return the item!
+
+        curr = self._first
+        if i == 0:
+            if curr is None:
+                raise IndexError
+            else:
+                self._first = curr.next
+                return curr.item
+        else:
+            count = 0
+
+            while curr.next is not None:
+                if i - 1 == count:
+                    temp = curr.next.item
+                    curr.next = curr.next.next
+                    return temp
+                curr = curr.next
+                count += 1
+
+            raise IndexError
+
+    def remove(self, item: Any) -> None:
+        """Remove the first occurence of item from the list.
+
+        Raise ValueError if the item is not found in the list.
+
+        >>> lst = LinkedList([10, 30, 20])
+        >>> lst.remove(10)
+        >>> lst.to_list()
+        [30, 20]
+        >>> lst.remove(30)
+        >>> lst.to_list()
+        [20]
+        >>> lst.remove(20)
+        >>> lst.to_list()
+        []
+        >>> lst.remove(20)
+        Traceback (most recent call last):
+        ValueError
+        """
+        curr = self._first
+        if curr is None:
+            raise ValueError
+        elif curr.next is None:
+            if curr.item == item:
+                self._first = None
+            else:
+                raise ValueError
+        else:
+            if curr.item == item:
+                self._first = curr.next
+            else:
+                while curr.next.next is not None:
+                    if curr.next.item == item:
+                        curr.next = curr.next.next
+                        return None
+                    curr = curr.next
+                raise ValueError
