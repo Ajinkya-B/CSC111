@@ -44,6 +44,20 @@ class LinkedList:
     def __init__(self) -> None:
         self._first = None
 
+    def __len__(self) -> int:
+        """Return the number of elements in this list. """
+        len_so_far = 1
+        curr = self._first
+
+        if curr is None:
+            return 0
+        else:
+            while curr.next is not None:
+                len_so_far += 1
+                curr = curr.next
+
+            return len_so_far
+
     def __getitem__(self, item: int) -> Any:
         """Return the item stored at index i in this linked list.
         Raise an IndexError if index i is out of bounds.
@@ -63,40 +77,6 @@ class LinkedList:
             raise IndexError
         else:
             return curr.item
-
-    def __contains__(self, item: Any) -> bool:
-        """Return whether item is in this linked list.
-
-        >>> linky = LinkedList()
-        >>> linky.__contains__(10)
-        False
-        >>> node2 = _Node(20)
-        >>> node1 = _Node(10, node2)
-        >>> linky._first = node1
-        >>> linky.__contains__(20)
-        True
-        """
-        curr = self._first
-
-        while curr is not None:
-            if curr.item == item:
-                return True
-            curr = curr.next
-        return False
-
-    def __len__(self) -> int:
-        """Return the number of elements in this list. """
-        len_so_far = 1
-        curr = self._first
-
-        if curr is None:
-            return 0
-        else:
-            while curr.next is not None:
-                len_so_far += 1
-                curr = curr.next
-
-            return len_so_far
 
     def __setitem__(self, i: int, item: Any) -> None:
         """Store item at index i in this list.
@@ -121,6 +101,41 @@ class LinkedList:
                 raise IndexError
             elif count == i:
                 curr.item = item
+
+    def __contains__(self, item: Any) -> bool:
+        """Return whether item is in this linked list.
+
+        >>> linky = LinkedList()
+        >>> linky.__contains__(10)
+        False
+        >>> node2 = _Node(20)
+        >>> node1 = _Node(10, node2)
+        >>> linky._first = node1
+        >>> linky.__contains__(20)
+        True
+        """
+        curr = self._first
+
+        while curr is not None:
+            if curr.item == item:
+                return True
+            curr = curr.next
+        return False
+
+    def is_empty(self) -> bool:
+        """Returns if a list is empty."""
+        return self._first is None
+
+    def to_list(self) -> list:
+        """Returns the linked list as an array based implementation of List ADT"""
+        list_so_far = []
+        curr = self._first
+
+        while curr is not None:
+            list_so_far.append(curr.item)
+            curr = curr.next
+
+        return list_so_far
 
     def maximum(self) -> float:
         """Return the maximum element in this linked list.
@@ -147,21 +162,6 @@ class LinkedList:
             max_so_far = max(max_so_far, curr.item)
 
         return max_so_far
-
-    def is_empty(self) -> bool:
-        """Returns if a list is empty."""
-        return self._first is None
-
-    def to_list(self) -> list:
-        """Returns the linked list as an array based implementation of List ADT"""
-        list_so_far = []
-        curr = self._first
-
-        while curr is not None:
-            list_so_far.append(curr.item)
-            curr = curr.next
-
-        return list_so_far
 
     def sum(self) -> float:
         """Return the sum of the elements in this linked list.
@@ -221,6 +221,7 @@ class LinkedList:
 
             raise ValueError
 
+    # Mutating lower-level methods
     def append(self, item: Any) -> None:
         """Add the given item to the end of this linked list.
 
