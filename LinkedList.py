@@ -401,7 +401,8 @@ class LinkedList:
         []
         >>> lst.remove(20)
         Traceback (most recent call last):
-        ValueError
+        IndexError
+        """
         """
         curr = self._first
         if curr is None:
@@ -421,3 +422,19 @@ class LinkedList:
                         return None
                     curr = curr.next
                 raise ValueError
+
+        """
+        prev, curr = None, self._first
+        if curr is None:
+            raise IndexError
+
+        while curr is not None and curr.item != item:
+            curr, prev = curr.next, curr
+
+        if curr is None:
+            raise ValueError
+        else:
+            if prev is None:
+                self._first = curr.next
+            else:
+                prev.next = curr.next
