@@ -44,8 +44,17 @@ class LinkedList:
     def __init__(self, items: list) -> None:
         """Initialize a new linked list containing the given items."""
         self._first = None
+        curr = None
+
         for item in items:
-            self.append(item)
+            if curr is None:
+                new_node = _Node(item)
+                self._first = new_node
+                curr = self._first
+            else:
+                new_node = _Node(item)
+                curr.next = new_node
+                prev, curr, = curr, curr.next
 
     def __len__(self) -> int:
         """Return the number of elements in this list. """
