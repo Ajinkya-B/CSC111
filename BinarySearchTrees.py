@@ -107,6 +107,18 @@ class BinarySearchTree:
         elif self._right.is_empty():
             self._root, self._left, self._right = self._left._root, self._left._left, self._left._right
         else:
-            # TODO: Complete case when deleting a middle root
-            pass
-    
+            self._root = self._extract_leftmost_root()
+
+    def _extract_leftmost_root(self) -> Any:
+        """Returns the leftmost element of the BST.
+        Also mutates the BST by removing the leftmost root.
+        """
+        if self._left.is_empty():
+            temp = self._root
+            self._root = None
+            self._left = None
+            self._right = None
+            return temp
+        else:
+            return self._left._extract_leftmost_root()
+
