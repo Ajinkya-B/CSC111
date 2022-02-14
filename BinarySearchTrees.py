@@ -1,5 +1,5 @@
 """
-This file goes over some of the functions we used to work with binary search trees.
+This file goes over some of the methods we used to work with binary search trees.
 
 Copyright and Usage Information
 ===============================
