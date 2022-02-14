@@ -64,6 +64,34 @@ class BinarySearchTree:
         """
         return self._root is None
 
+    def count(self, item: Any) -> int:
+        """Returns the count of <item> in the BST
+
+        >>> bst = BinarySearchTree(7)
+        >>> bst.count(7)
+        1
+        >>> left = BinarySearchTree(3)
+        >>> left._left = BinarySearchTree(3)
+        >>> left._right = BinarySearchTree(5)
+        >>> right = BinarySearchTree(11)
+        >>> right._left = BinarySearchTree(9)
+        >>> right._right = BinarySearchTree(13)
+        >>> bst._left = left
+        >>> bst._right = right
+        >>> bst.count(3)
+        2
+        >>> bst.count(4)
+        0
+        """
+        if self.is_empty():
+            return 0
+        elif item == self._root:
+            return 1 + self._left.count(item) + self._right.count(item)
+        elif item > self._root:
+            return self._right.count(item)
+        else:
+            return self._left.count(item)
+
     def insert(self, item: Any) -> None:
         """Insert <item> into this tree.
 
@@ -122,3 +150,22 @@ class BinarySearchTree:
         else:
             return self._left._extract_leftmost_root()
 
+    def height(self) -> int:
+        """Return the height of this BST.
+
+        >>> BinarySearchTree(None).height()
+        0
+        >>> bst = BinarySearchTree(7)
+        >>> bst.height()
+        1
+        >>> bst.insert(5)
+        >>> bst.height()
+        2
+        >>> bst.insert(9)
+        >>> bst.height()
+        2
+        """
+        if self.is_empty():
+            return 0
+        else:
+            return 1 + max(self._left.height(), self._right.height())
