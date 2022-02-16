@@ -71,6 +71,45 @@ class Graph:
             # We didn't find an existing vertex for both items.
             raise ValueError
 
+    def adjacent(self, item1: Any, item2: Any) -> bool:
+        """Return whether item1 and item2 are adjacent vertices in this graph.
+
+        Return False if item1 or item2 do not appear as vertices in this graph.
+
+        Sample Usage:
+        >>> graph = create_sample_graph()
+        >>> graph.adjacent(7, 6) # at least one item not in the graph
+        False
+        >>> graph.adjacent(5, 4)
+        True
+        >>> graph.adjacent(4, 6) # both items in a graph, but are not neighbours
+        False
+        """
+        if item1 in self._vertices and item2 in self._vertices:
+            return any(item2 == vertex.item for vertex in self._vertices[item1].neighbours)
+        else:
+            return False
+
+    def get_neighbours(self, item: Any) -> set:
+        """Return a set of the neighbours of the given item.
+
+        Note that the *items* are returned, not the _Vertex objects themselves.
+
+        Raise a ValueError if item does not appear as a vertex in this graph.
+
+        Sample Usage:
+
+        >>> graph = create_sample_graph()
+        >>> graph.get_neighbours(4) == {5, 2}
+        True
+        >>> graph.get_neighbours(5) == {4}
+        True
+        """
+        if item in self._vertices:
+            return set(vertex.item for vertex in self._vertices[item].neighbours)
+        else:
+            raise ValueError
+
 
 def complete_graph(n: int) -> Graph:
     """Return a graph of n vertices where all pairs of vertices are adjacent.
@@ -86,5 +125,16 @@ def complete_graph(n: int) -> Graph:
         graph.add_vertex(v)
         for u in range(v):
             graph.add_edge(v, u)
+
+    return graph
+
+
+def create_sample_graph() -> Graph:
+    graph = Graph()
+    for item in [5, 4, 2, 6]:
+        graph.add_vertex(item)
+    graph.add_edge(4, 5)
+    graph.add_edge(4, 2)
+    graph.add_edge(6, 2)
 
     return graph
