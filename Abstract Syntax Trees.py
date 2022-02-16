@@ -7,22 +7,26 @@ This file is Copyright (c) 2021 Ajinkya Bhosale.
 """
 
 from __future__ import annotations
-from typing import Any, Union
+from typing import Any, Union, Optional
 
 
-class Expr:
-    """An abstract class representing a Python expression.
+class Statement:
+    """An abstract class representing a Python statement.
     """
-
-    def evaluate(self) -> Any:
-        """Return the *value* of this expression.
-
-        The returned value should the result of how this expression would be
-        evaluated by the Python interpreter.
+    def evaluate(self, env: dict[str, Any]) -> Optional[Any]:
+        """Evaluate this statement with the given environment.
         """
         raise NotImplementedError
 
 
+class Expr(Statement):
+    """An abstract class representing a Python expression.
+    """
+
+
+################################################################################
+# Arithmetic Expression
+################################################################################
 class Num(Expr):
     """A numeric literal.
 
@@ -35,14 +39,15 @@ class Num(Expr):
         """Initialize a new numeric literal."""
         self.n = number
 
-    def evaluate(self) -> Any:
+    def evaluate(self, env: dict[str, Any]) -> Any:
         """Return the *value* of this expression.
 
         The returned value should the result of how this expression would be
         evaluated by the Python interpreter.
 
         >>> expr = Num(10.5)
-        >>> expr.evaluate()
+        >>> env = {}
+        >>> expr.evaluate(env)
         10.5
         """
         return self.n  # Simply return the value itself!
@@ -85,18 +90,19 @@ class BinOp(Expr):
         self.op = op
         self.right = right
 
-    def evaluate(self) -> Any:
+    def evaluate(self, env: dict[str, Any]) -> Any:
         """Return the *value* of this expression.
 
         The returned value should the result of how this expression would be
         evaluated by the Python interpreter.
 
         >>> expr = BinOp(Num(10.5), '+', Num(30))
-        >>> expr.evaluate()
+        >>> env = {}
+        >>> expr.evaluate(env)
         40.5
         """
-        left_val = self.left.evaluate()
-        right_val = self.right.evaluate()
+        left_val = self.left.evaluate(env)
+        right_val = self.right.evaluate(env)
 
         if self.op == '+':
             return left_val + right_val
@@ -113,7 +119,7 @@ class BinOp(Expr):
 
 
 ################################################################################
-# Prep exercises
+# Boolean Expression
 ################################################################################
 class Bool(Expr):
     """A boolean literal.
@@ -127,14 +133,15 @@ class Bool(Expr):
         """Initialize a new boolean literal."""
         self.b = b
 
-    def evaluate(self) -> Any:
+    def evaluate(self, env: dict[str, Any]) -> Any:
         """Return the *value* of this expression.
 
         The returned value should the result of how this expression would be
         evaluated by the Python interpreter.
 
         >>> expr = Bool(True)
-        >>> expr.evaluate()
+        >>> env = {}
+        >>> expr.evaluate(env)
         True
         """
         return self.b
@@ -178,40 +185,41 @@ class BoolOp(Expr):
         self.op = op
         self.operands = operands
 
-    def evaluate(self) -> Any:
+    def evaluate(self, env: dict[str, Any]) -> Any:
         """Return the *value* of this expression.
 
         The returned value should the result of how this expression would be
         evaluated by the Python interpreter.
 
         >>> expr = BoolOp('and', [Bool(True), Bool(True), Bool(False)])
-        >>> expr.evaluate()
+        >>> env = {}
+        >>> expr.evaluate(env)
         False
         >>> expr = BoolOp('or', [Bool(True), Bool(False), Bool(True), Bool(False)])
-        >>> expr.evaluate()
+        >>> expr.evaluate(env)
         True
         >>> expr = BoolOp('or', [Bool(False), Bool(False),\
         BoolOp('and', [Bool(True), Bool(True), Bool(True)]), Bool(False)])
-        >>> expr.evaluate()
+        >>> expr.evaluate(env)
         True
         """
-        first = self.operands[0].evaluate()
+        first = self.operands[0].evaluate(env)
         rest = self.operands[1:]
 
         if self.op == 'or':
             if first:
                 return True
             elif len(rest) == 1:
-                return self.operands[1].evaluate()
+                return self.operands[1].evaluate(env)
             else:
-                return BoolOp('or', rest).evaluate()
+                return BoolOp('or', rest).evaluate(env)
         elif self.op == 'and':
             if not first:
                 return False
             elif len(rest) == 1:
-                return self.operands[1].evaluate()
+                return self.operands[1].evaluate(env)
             else:
-                return BoolOp('and', rest).evaluate()
+                return BoolOp('and', rest).evaluate(env)
         else:
             raise ValueError(f'Invalid operator {self.op}')
 
@@ -264,38 +272,39 @@ class Compare(Expr):
         self.left = left
         self.comparisons = comparisons
 
-    def evaluate(self) -> Any:
+    def evaluate(self, env: dict[str, Any]) -> Any:
         """Return the *value* of this expression.
 
         The returned value should the result of how this expression would be
         evaluated by the Python interpreter.
 
         >>> expr = Compare(Num(1), [('<=', Num(1))])
-        >>> expr.evaluate()
+        >>> env = {}
+        >>> expr.evaluate(env)
         True
         >>> expr = Compare(Num(1), [
         ...            ('<=', Num(2)),
         ...            ('<', Num(4.5)),
         ...            ('<=', Num(4.5))])
-        >>> expr.evaluate()
+        >>> expr.evaluate(env)
         True
         """
-        first = self.left.evaluate()
-        second = self.comparisons[0][1].evaluate()
+        first = self.left.evaluate(env)
+        second = self.comparisons[0][1].evaluate(env)
         rest = self.comparisons
 
         if rest[0][0] == '<':
             if len(rest) == 1:
                 return first < second
             elif first < second:
-                return Compare(rest[0][1], rest[1:]).evaluate()
+                return Compare(rest[0][1], rest[1:]).evaluate(env)
             else:
                 return False
         elif rest[0][0] == '<=':
             if len(rest) == 1:
                 return first <= second
             elif first <= second:
-                return Compare(rest[0][1], rest[1:]).evaluate()
+                return Compare(rest[0][1], rest[1:]).evaluate(env)
             else:
                 return False
         else:
@@ -315,3 +324,58 @@ class Compare(Expr):
         for operator, subexpr in self.comparisons:
             s += f' {operator} {str(subexpr)}'
         return '(' + s + ')'
+
+
+class Name(Expr):
+    """A variable expression.
+
+    Instance Attributes:
+      - id: The variable name in this expression.
+    """
+    id: str
+
+    def __init__(self, id_: str) -> None:
+        """Initialize a new variable expression."""
+        self.id = id_
+
+    def evaluate(self, env: dict[str, Any]) -> Any:
+        """Return the *value* of this expression using the given variable environment.
+        """
+        if self.id in env:
+            return env[self.id]
+        else:
+            raise NameError
+
+
+################################################################################
+# Boolean Expression
+################################################################################
+class Assign(Statement):
+    """An assignment statement (with a single target).
+
+    Instance Attributes:
+      - target: the variable name on the left-hand side of the = sign
+      - value: the expression on the right-hand side of the = sign
+    """
+    target: str
+    value: Expr
+
+    def __init__(self, target: str, value: Expr) -> None:
+        """Initialize a new Assign node."""
+        self.target = target
+        self.value = value
+
+    def evaluate(self, env: dict[str, Any]) -> None:
+        """Evaluate this statement.
+
+        This does the following: evaluate the right-hand side expression,
+        and then update <env> to store a binding between this statement's
+        target and the corresponding value.
+
+        >>> stmt = Assign('x', BinOp(Num(10), '+', Num(3)))
+        >>> env = {}
+        >>> stmt.evaluate(env)
+        >>> env['x']
+        13
+        """
+        env[self.target] = self.value.evaluate(env)
