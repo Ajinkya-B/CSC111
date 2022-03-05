@@ -29,6 +29,25 @@ class _Vertex:
         self.item = item
         self.neighbours = neighbours
 
+    def check_connected(self, target_item: Any, visited: set[_Vertex]) -> bool:
+        """Return whether this vertex is connected to a vertex corresponding to the target_item,
+        WITHOUT using any of the vertices in visited.
+
+        Preconditions:
+            - self not in visited
+        """
+
+        if self.item == target_item:
+            return True
+        else:
+            visited.add(self)
+            for v in self.neighbours:
+                if v not in visited:
+                    if v.check_connected(target_item, visited):
+                        return True
+            return False
+
+
 
 class Graph:
     """A graph."""
@@ -60,6 +79,7 @@ class Graph:
         Preconditions:
             - item1 != item2
         """
+        # Checking if the inputted items are even a vertex in the current graph
         if item1 in self._vertices and item2 in self._vertices:
             v1 = self._vertices[item1]
             v2 = self._vertices[item2]
@@ -85,8 +105,10 @@ class Graph:
         >>> graph.adjacent(4, 6) # both items in a graph, but are not neighbours
         False
         """
+        # Checking if the inputted items are even a vertex in the current graph
         if item1 in self._vertices and item2 in self._vertices:
-            return any(item2 == vertex.item for vertex in self._vertices[item1].neighbours)
+            v1 = self._vertices[item1]
+            return any(v2.item == item2 for v2 in v1.neighbours)
         else:
             return False
 
@@ -106,7 +128,8 @@ class Graph:
         True
         """
         if item in self._vertices:
-            return set(vertex.item for vertex in self._vertices[item].neighbours)
+            v1 = self._vertices[item]
+            return {neighbour.item for neighbour in v1.neighbours}
         else:
             raise ValueError
 
@@ -127,6 +150,11 @@ class Graph:
         >>> g.connected(1, 4)
         False
         """
+        if item1 in self._vertices and item2 in self._vertices:
+            v1 = self._vertices[item1]
+            return v1.check_connected(item2, set())  # Pass in an empty "visited" set
+        else:
+            return False
 
 
 def complete_graph(n: int) -> Graph:
