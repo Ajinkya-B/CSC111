@@ -348,7 +348,7 @@ class Name(Expr):
 
 
 ################################################################################
-# Boolean Expression
+# Assignment Statement
 ################################################################################
 class Assign(Statement):
     """An assignment statement (with a single target).
@@ -379,3 +379,46 @@ class Assign(Statement):
         13
         """
         env[self.target] = self.value.evaluate(env)
+
+
+################################################################################
+# Parallel-Assignment Statement
+################################################################################
+class ParallelAssign(Statement):
+    """A parallel assignment statement.
+
+    Instance Attributes:
+        - targets: the variable names being assigned to---the left-hand side of the =
+        - values: the expressions being assigned---the right-hand side of the =
+    """
+    targets: list[str]
+    values: list[Expr]
+
+    def __init__(self, targets: list[str], values: list[Expr]) -> None:
+        """Initialize a new ParallelAssign node."""
+        self.targets = targets
+        self.values = values
+
+    def evaluate(self, env: dict[str, Any]) -> None:
+        """Evaluate this statement.
+
+        This does the following: evaluate each expression on the right-hand side
+        and then bind each target to its corresponding expression.
+
+        Raise a ValueError if the lengths of self.targets and self.values are
+        not equal.
+
+        >>> stmt = ParallelAssign(['x', 'y'],
+        ...                       [BinOp(Num(10), '+', Num(3)), Num(-4.5)])
+        >>> env = {}
+        >>> stmt.evaluate(env)
+        >>> env['x']
+        13
+        >>> env['y']
+        -4.5
+        """
+        if len(self.targets) == len(self.values):
+            for i in range(len(self.targets)):
+                env[self.targets[i]] = self.values[i].evaluate(env)
+        else:
+            raise ValueError

@@ -110,6 +110,24 @@ class Graph:
         else:
             raise ValueError
 
+    def connected(self, item1: Any, item2: Any) -> bool:
+        """Return whether item1 and item2 are connected vertices in this graph.
+
+        Return False if item1 or item2 do not appear as vertices in this graph.
+
+        >>> g = Graph()
+        >>> g.add_vertex(1)
+        >>> g.add_vertex(2)
+        >>> g.add_vertex(3)
+        >>> g.add_vertex(4)
+        >>> g.add_edge(1, 2)
+        >>> g.add_edge(2, 3)
+        >>> g.connected(1, 3)
+        True
+        >>> g.connected(1, 4)
+        False
+        """
+
 
 def complete_graph(n: int) -> Graph:
     """Return a graph of n vertices where all pairs of vertices are adjacent.
