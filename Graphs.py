@@ -48,7 +48,6 @@ class _Vertex:
             return False
 
 
-
 class Graph:
     """A graph."""
     # Private Instance Attributes:
@@ -132,6 +131,28 @@ class Graph:
             return {neighbour.item for neighbour in v1.neighbours}
         else:
             raise ValueError
+
+    def num_edges(self) -> int:
+        """Return the number of edges in this graph.
+
+        >>> g = Graph()
+        >>> g.add_vertex(1)
+        >>> g.add_vertex(2)
+        >>> g.add_vertex(3)
+        >>> g.add_vertex(4)
+        >>> g.add_edge(1, 2)
+        >>> g.add_edge(2, 3)
+        >>> g.num_edges()
+        2
+        >>> g.add_edge(1, 3)
+        >>> g.num_edges()
+        3
+        """
+        sum_so_far = 0
+        for v in self._vertices.values():
+            sum_so_far += len(v.neighbours)
+
+        return sum_so_far // 2
 
     def connected(self, item1: Any, item2: Any) -> bool:
         """Return whether item1 and item2 are connected vertices in this graph.
