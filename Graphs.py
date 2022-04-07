@@ -29,6 +29,54 @@ class _Vertex:
         self.item = item
         self.neighbours = neighbours
 
+    def print_all_connected(self, visited: set[_Vertex]) -> None:
+        """Print all items that this vertex is connected to, WITHOUT using any of the vertices
+        in visited.
+
+        Preconditions:
+            - self not in visited
+        """
+        print(self.item)
+        visited.add(self)
+        for neighbour in self.neighbours:
+            if neighbour not in visited:
+                neighbour.print_all_connected(visited)
+
+    def print_all_connected_indented(self, visited: set[_Vertex], d: int) -> None:
+        """Print all items that this vertex is connected to, WITHOUT using any of the vertices
+        in visited.
+
+        Print out the items with indentation level d
+
+        Preconditions:
+            - self not in visited
+        """
+        print(' ' * d, self.item)
+        visited.add(self)
+        for neighbour in self.neighbours:
+            if neighbour not in visited:
+                neighbour.print_all_connected_indented(visited, d + 1)
+
+    def spanning_tree(self, visited: set[_Vertex]) -> list[set]:
+        """Return a spanning tree for all items this vertex is connected to,
+        WITHOUT using any of the vertices in visited.
+
+        Preconditions:
+            - self not in visited
+        """
+
+        visited.add(self)
+        edges_so_far = []
+
+        for neighbour in self.neighbours:
+            if neighbour not in visited:
+                edge = {self.item, neighbour.item}
+                edges_so_far.append(edge)
+
+                edges_so_far.extend(neighbour.spanning_tree(visited))
+
+        return edges_so_far
+
     def check_connected(self, target_item: Any, visited: set[_Vertex]) -> bool:
         """Return whether this vertex is connected to a vertex corresponding to the target_item,
         WITHOUT using any of the vertices in visited.
@@ -176,6 +224,20 @@ class Graph:
             return v1.check_connected(item2, set())  # Pass in an empty "visited" set
         else:
             return False
+
+    def spanning_tree(self) -> list[set]:
+        """Return a subset of the edges of this graph that form a spanning tree.
+
+        The edges are returned as a list of sets, where each set contains the two
+        ITEMS corresponding to an edge. Each returned edge is in this graph
+        (i.e., this function doesn't create new edges!).
+
+        Preconditions:
+            - this graph is connected
+        """
+
+        # get a starting vertex
+        return self._vertices[0].spanning_tree(set())
 
 
 def complete_graph(n: int) -> Graph:
