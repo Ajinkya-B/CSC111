@@ -161,7 +161,7 @@ Insertion Sort
 def insertion_sort(lst: list) -> None:
     """Sort the given list using the insertion sort algorithm.
     >>> lst = [3, 7, 2, 5]
-    >>> selection_sort(lst)
+    >>> insertion_sort(lst)
     >>> lst
     [2, 3, 5, 7]
     """
@@ -210,3 +210,139 @@ def _insert(lst: list, i: int) -> None:
 # Note that the steps required for each iteration depends on the value of i
 # Since the value of i increments by 1, going from 0 to n-1, the for loop will take n(n-1)/2 steps.
 # Therefore, the Big-O bound of this function is n^2.
+
+
+"""
+===============================================
+Selection Sort vs Insertion Sort: Running Times
+===============================================
+"""
+
+# Although the worst case RT of insertion sort matches the RT of selection sort, normally the list wouldn't be at the
+# worst case state. The best case RT of insertion sort is n, which is much faster than any RT of selection sort.
+
+
+"""
+===============================================
+Divide-and-Conquer Algorithms
+===============================================
+"""
+
+# This way of sorting refers to:
+# 1. Given a list to sort, split it up into two or more smaller lists.
+# 2. Recursively run the sorting algorithm on each smaller list separately.
+# 3. Combine the sorted results of each recursive call into a single sorted list.
+
+
+"""
+============================================
+Mergesort
+============================================
+"""
+
+# 1. Divide the input list into right and left half.
+# 2. Recursively sort each half
+# 3. Merge each sorted half together
+
+
+# Non-mutating implementation of mergesort
+def mergesort(lst: list) -> list:
+    """Return a new sorted list with the same elements as lst.
+    >>> lst = [3, 7, 2, 5]
+    >>> mergesort(lst)
+    [2, 3, 5, 7]
+    """
+    if len(lst) < 2:  # base case: cannot divide the input list any further.
+        return lst.copy()  # to return a NEW list object
+    else:
+        # Divide the input list into two pieces
+        c = len(lst) // 2
+        left = lst[:c]
+        right = lst[c:]
+
+        # Sort each part recursively
+        left_sorted = mergesort(left)
+        right_sorted = mergesort(right)
+
+        # Combine the two sorted parts
+        return _merge(left_sorted, right_sorted)
+
+
+def _merge(lst1: list, lst2: list) -> list:
+    """Return a sorted list with the elements in lst1 and lst2.
+
+    Preconditions:
+        - is_sorted(lst1)
+        - is_sorted(lst2)
+    """
+    sorted_list = []
+    i1 = 0
+    i2 = 0
+    while i1 < len(lst1) and i2 < len(lst2):
+        if lst1[i1] <= lst2[i2]:
+            sorted_list.append(lst1[i1])
+            i1 += 1
+        else:
+            sorted_list.append(lst2[i2])
+            i2 += 1
+
+    assert i1 == len(lst1) or i2 == len(lst2)
+
+    if i1 == len(lst1):
+        return sorted_list + lst2[i2:]
+    else:  # i2 == len(lst2)
+        return sorted_list + lst1[i1:]
+
+
+"""
+============================================
+Quicksort
+============================================
+"""
+
+# 1. First we pick one element from the input list, this is called the pivot
+#    - Using the pivot, we divide the list into two pieces:
+#         - elements less than or equal to the pivot
+#         - elements greater than the pivot
+# 2. Now, we recursively sort each part.
+# 3. Finally, we concatenate the two sorted parts
+
+
+# Non-mutating implementation of quicksort
+def quicksort(lst: list) -> list:
+    """Return a sorted list with the same elements as lst.
+    >>> lst = [3, 7, 2, 5]
+    >>> quicksort(lst)
+    [2, 3, 5, 7]
+    """
+    if len(lst) < 2:  # Base Case
+        return lst.copy()
+    else:
+        # Divide the input list into 2 pieces while always using the first element as a pivot.
+        pivot = lst[0]
+        smaller, bigger = _partition(lst[1:], pivot)
+
+        # Sort each part recursively
+        smaller_sorted = quicksort(smaller)
+        bigger_sorted = quicksort(bigger)
+
+        # Combine the two sorted parts
+        return smaller_sorted + [pivot] + bigger_sorted
+
+
+def _partition(lst: list, pivot: Any) -> tuple[list, list]:
+    """Return a partition of lst with the chosen pivot.
+
+    Return two lists, where the first contains the items in lst
+    that are <= pivot, and the second contains the items in lst that are > pivot.
+    """
+    smaller = []
+    bigger = []
+
+    for item in lst:
+        if item <= pivot:
+            smaller.append(item)
+        else:
+            bigger.append(item)
+
+    return smaller, bigger
